@@ -2,43 +2,94 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import Video, { Room } from "twilio-video";
+import Video, { Room, VideoTrack } from "twilio-video";
+import { api } from "../service/api";
 import styles from "../styles/Home.module.css";
 
-const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6InR3aWxpby1mcGE7dj0xIn0.eyJqdGkiOiJTS2U1YjU5MTQ5NGZlODFiOWQ1ZjMzNjhhOGM3MWI4MjlmLTE2NTczMDc2NDUiLCJncmFudHMiOnsiaWRlbnRpdHkiOiJWaW5pY2l1cyIsInZpZGVvIjp7fX0sImlhdCI6MTY1NzMwNzY0NSwiZXhwIjoxNjU3MzExMjQ1LCJpc3MiOiJTS2U1YjU5MTQ5NGZlODFiOWQ1ZjMzNjhhOGM3MWI4MjlmIiwic3ViIjoiQUM3MmFhNGYwZWM4MjJmYWU2ZDJmYTg2NzU4NjlkZDU0MSJ9.Sux2P48jn63L7SQDPxILPk1IsxRx0GTkJwMhwC1tgyg";
-
 const Home: NextPage = () => {
-  // useEffect(() => {
-  //   createVideo();
-  // }, []);
+  const [roomConnected, setRoom] = useState<any>({});
+  const [token, setToken] = useState<string>("");
+  const connect = useCallback(
+    (token: string) => {
+      Video.connect(token, {
+        name,
+      }).then((room) => {
+        setRoom(room);
+        const { localParticipant } = room;
 
-  const [roomConnected, setRoom] = useState<Video.Room>();
-  const connect = useCallback(() => {
-    Video.connect(token, {
-      name: "EvoleTeste",
-    }).then((room) => {
-      setRoom(room);
-      const { localParticipant } = room;
+        room.on("participantConnected", (participant) => {
+          participant.videoTracks.forEach((videoTrack) => {
+            const video = document.getElementById("video");
+            if (videoTrack.track) {
+              video?.appendChild?.(videoTrack.track.attach());
+            }
+          });
+        });
 
-      room.on("participantConnected", (participant) =>
-        console.log(participant)
-      );
-
-      localParticipant.videoTracks.forEach((videoTrack) => {
-        console.log("videoTrack", videoTrack.kind);
-        document
-          .getElementById("video")
-          ?.appendChild(videoTrack.track.attach())
-          ?.classList.add("videotrack");
+        localParticipant.videoTracks.forEach((videoTrack) => {
+          console.log("videoTrack", videoTrack.kind);
+          document
+            .getElementById("video")
+            ?.appendChild(videoTrack.track.attach())
+            ?.classList.add("videotrack");
+        });
       });
-    });
-  }, []);
+    },
+    [token]
+  );
+
+  // useEffect(() => {
+  //   roomConnected?.on("participantConnected", (participant) => {
+  //     participant.videoTracks.forEach((videoTrack) => {
+  //       const video = document.getElementById("video");
+  //       if (videoTrack.track) {
+  //         video?.appendChild?.(videoTrack?.track?.attach());
+  //       }
+  //     });
+  //   });
+  // }, [roomConnected]);
+
+  const [name, setName] = useState("");
+
+  const createToken = useCallback(() => {
+    api
+      .post("/token", {
+        name,
+        indentity: "Vinicius",
+      })
+      .then((res) => {
+        setToken(res.data.token);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [name]);
+
+  const createRoom = useCallback(async () => {
+    await api
+      .post("/room", {
+        name,
+      })
+      .then((response) => setRoom(response.data))
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [setRoom]);
 
   const disconnect = useCallback(() => {
     roomConnected?.disconnect();
     const node = document.getElementsByClassName("videotrack")?.[0];
     document.getElementById("video")?.removeChild(node);
+  }, [roomConnected]);
+
+  const disabledVideo = useCallback(() => {
+    if (roomConnected) {
+      roomConnected.localParticipant.videoTracks.forEach((videoTrack: any) =>
+        videoTrack.track.isEnabled
+          ? videoTrack.track.disable()
+          : videoTrack.track.enable()
+      );
+    }
   }, [roomConnected]);
 
   const [isDisabled, setIsDisabled] = useState(true);
@@ -51,11 +102,21 @@ const Home: NextPage = () => {
   return (
     <div>
       teste video twilio
-      <button onClick={connect}>connect room</button>
+      <input value={name} onChange={(e) => setName(e.target.value)} />
+      <button onClick={createRoom} disabled={name === ""}>
+        create room
+      </button>
+      <button onClick={createToken}>create token</button>
+      <button onClick={() => connect(token)}>connect room</button>
       <button onClick={disconnect} disabled={isDisabled}>
         disconnect room
       </button>
-      <div id="video"></div>
+      <div>sala: {roomConnected?.uniqueName}</div>
+      <div>token: {token}</div>
+      <div style={{ display: "flex" }}>
+        <div id="video"></div>
+      </div>
+      <button onClick={disabledVideo}>desligar camera</button>
     </div>
   );
 };
