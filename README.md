@@ -1,18 +1,3 @@
-## Screenshots
-
-### Login Screen
-
-![Login Screen](/gitassets/screen1.png)
-
-### Video Screen
-
-![Chat Screen](/gitassets/screen2.png)
-
-## How it works
-
-This application use the twilio(www.twilio.com) API to create a video chat application api.
-The frontend needs to request this video chat post route.
-
 ## Dependencies
 
 - NodeJS
@@ -35,10 +20,6 @@ The frontend needs to request this video chat post route.
 - You need to navigate to the frontend folder, after that you need to install all dependencies running `yarn`.
 - Whe it's done, you just need to run the following command `yarn start`
 
-## Developed by
-
-**@AndersonDev**
 
 ## References
-
 [Twilio Blog](https://www.twilio.com/blog/video-chat-react-hooks)
