@@ -14,6 +14,7 @@ export const VideoContainer = styled.div`
   background-color: #333333;
   display: flex;
   justify-content: center;
+  position: relative;
 
   @media (max-width: 880px) {
     flex-direction: column;

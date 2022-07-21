@@ -1,13 +1,21 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { IconButtonProps, ToolbarProps, VideoCardProps } from "./types";
 
 export const VideoCard = styled.div<VideoCardProps>`
-  width: ${(props) => props.width ?? "100%"};
-  height: ${(props) => props.height ?? "100%"};
+  width: ${(props) => (props.isLocal ? "400px" : props.width ?? "100%")};
+  height: ${(props) => (props.isLocal ? "300px" : props.height ?? "100%")};
   display: flex;
   justify-content: center;
   flex-direction: column;
-  position: relative;
+  position: ${({ isLocal }) => (isLocal ? "absolute" : "relative")};
+
+  ${({ isLocal }) =>
+    isLocal &&
+    css`
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 1;
+    `}
 `;
 
 export const Video = styled.video`
@@ -21,8 +29,12 @@ export const Video = styled.video`
 export const VideoTurnedOff = styled.div`
   width: 90%;
   height: 100%;
-  background-color: #000;
+  /* background-color: #000; */
+  background-color: #e3e3e3;
   align-self: center;
+  justify-content: center;
+  color: #000;
+  font-size: 1.5rem;
 `;
 
 export const ToolBar = styled.div<ToolbarProps>`

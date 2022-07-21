@@ -83,15 +83,14 @@ const ParticipantCard = ({ participant, isLocal, width, height }: IProps) => {
       height={height}
       onMouseOut={hideBar}
       onMouseOver={showBar}
+      isLocal={isLocal}
     >
-      {!isLocal && (
-        <ToolBar top opacity={opacity}>
-          <FirstNameChar>
-            {participant.identity.charAt(0).toUpperCase()}
-          </FirstNameChar>
-          <span>{participant.identity.toUpperCase()}</span>
-        </ToolBar>
-      )}
+      <ToolBar top>
+        <FirstNameChar>
+          {participant.identity.charAt(0).toUpperCase()}
+        </FirstNameChar>
+        <span>{participant.identity.toUpperCase()}</span>
+      </ToolBar>
       {isRemoteCameraOn ? (
         <Video ref={videoRef} autoPlay />
       ) : (
@@ -104,7 +103,13 @@ const ParticipantCard = ({ participant, isLocal, width, height }: IProps) => {
             {isMicOn() ? <MdMic /> : <MdMicOff />}
           </IconButton>
           <IconButton onClick={toggleLocalCamera} isActive={isCameraOn()}>
-            {isCameraOn() ? <MdVideocam /> : <MdVideocamOff />}
+            {isCameraOn() ? (
+              <MdVideocam />
+            ) : (
+              <MdVideocamOff>
+                {participant.identity.charAt(0).toUpperCase()}
+              </MdVideocamOff>
+            )}
           </IconButton>
         </ToolBar>
       )}

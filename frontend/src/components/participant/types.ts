@@ -10,6 +10,7 @@ import {
 export interface VideoCardProps {
   width?: string;
   height?: string;
+  isLocal?: boolean;
 }
 
 export interface ToolbarProps {
