@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { ButtonProps } from "./types";
 
 export const Button = styled.button<ButtonProps>`
-  background-color: ${(props) => props.backgroundColor ?? "#FFF"};
+  background-color: ${(props) => props.backgroundColor ?? "transparent"};
   color: ${(props) => props.color ?? "#000C66"};
   width: ${(props) => props.width ?? "135px"};
   height: ${(props) => props.height ?? "45px"};

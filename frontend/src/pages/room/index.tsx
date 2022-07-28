@@ -1,41 +1,24 @@
-import {
-  MdVideocam,
-  MdVideocamOff,
-  MdMic,
-  MdMicOff,
-  MdClose,
-} from "react-icons/md";
-import { useCallback, useEffect, useState } from "react";
-import { useHistory } from "react-router";
-import { useLocation } from "react-router-dom";
-import Video, { LocalParticipant } from "twilio-video";
+import { useCallback, useContext, useEffect } from "react";
+import Video from "twilio-video";
 
-import {
-  Container,
-  IconButton,
-  ToolBar,
-  VideoContainer,
-  RoomName,
-} from "./styled";
 import Participant from "../../components/participant";
-import { useRoom } from "../../hooks/useRoom";
+import { ParticipantsContext } from "../../contexts/Participants";
 import { calculateVideoCardSize } from "../../services/screen";
-import { useVideo } from "../../hooks/useVideo";
-import { useAudio } from "../../hooks/useAudio";
+// import { Container } from "./styled";
+
+import { ToolBar } from "../../components/ToolBar";
+import { RoomContext } from "../../contexts/Room";
+import { Videos, VideoContainer, Container } from "../meet/styles";
 
 const Room = () => {
-  const history = useHistory();
-  const routeData = useLocation<{ username: string; roomName: string }>().state;
-  const [participants, setParticipants] = useState<Video.RemoteParticipant[]>(
-    []
-  );
-  const [localParticipant, setLocalParticipant] = useState<LocalParticipant>();
-  const { connect, disconnect } = useRoom({
-    roomName: routeData?.roomName,
-    identity: routeData?.username,
-  });
-  const { isCameraOn, toggleVideo } = useVideo();
-  const { isMicOn, toggleAudio } = useAudio();
+  const {
+    participants,
+    localParticipant,
+    setParticipants,
+    setLocalParticipant,
+  } = useContext(ParticipantsContext);
+
+  const { connect, disconnect } = useContext(RoomContext);
 
   const videoCard = calculateVideoCardSize(participants);
 
@@ -53,13 +36,15 @@ const Room = () => {
   );
 
   const participantConnected = (participant: Video.RemoteParticipant) => {
-    setParticipants((prevParticipants) => [...prevParticipants, participant]);
+    const newParticipants = [...participants, participant];
+    setParticipants(newParticipants);
   };
 
   const participantDisconnected = (participant: Video.RemoteParticipant) => {
-    setParticipants((prevParticipants: Video.RemoteParticipant[]) =>
-      prevParticipants.filter((p: Video.RemoteParticipant) => p !== participant)
+    const newParticipants = participants.filter(
+      (p: Video.RemoteParticipant) => p !== participant
     );
+    setParticipants(newParticipants);
   };
 
   const disableTrackOnInit = (
@@ -69,11 +54,6 @@ const Room = () => {
     const { track } = [...room.localParticipant[type].values()][0];
     track.stop();
     track.disable();
-  };
-
-  const handleOnCloseClick = () => {
-    disconnect();
-    history.push("/");
   };
 
   useEffect(() => {
@@ -94,34 +74,19 @@ const Room = () => {
   return (
     <Container>
       <VideoContainer>
-        {localParticipant && (
-          <Participant
-            width={videoCard.width}
-            height={participants.length > 0 ? videoCard.height : "auto"}
-            isLocal
-            participant={localParticipant}
-          />
-        )}
-        {renderRemoteParticipants()}
+        <Videos>
+          {localParticipant && (
+            <Participant
+              width={videoCard.width}
+              height={participants.length > 0 ? videoCard.height : "auto"}
+              isLocal
+              participant={localParticipant}
+            />
+          )}
+          {renderRemoteParticipants()}
+        </Videos>
       </VideoContainer>
-      <ToolBar>
-        <IconButton
-          isActive={isMicOn}
-          onClick={() => toggleAudio({ localParticipant })}
-        >
-          {isMicOn ? <MdMic /> : <MdMicOff />}
-        </IconButton>
-        <IconButton isActive onClick={handleOnCloseClick}>
-          <MdClose />
-        </IconButton>
-        <IconButton
-          isActive={isCameraOn}
-          onClick={() => toggleVideo({ localParticipant })}
-        >
-          {isCameraOn ? <MdVideocam /> : <MdVideocamOff />}
-        </IconButton>
-        <RoomName>Room name: {routeData.roomName}</RoomName>
-      </ToolBar>
+      <ToolBar />
     </Container>
   );
 };
