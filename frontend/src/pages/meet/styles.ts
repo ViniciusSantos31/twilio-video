@@ -13,6 +13,7 @@ export const Container = styled.div`
 export const VideoContainer = styled.div`
   width: 100%;
   padding: 1rem;
+  min-height: 80vh;
 `;
 
 export const Videos = styled.div`
@@ -23,7 +24,8 @@ export const Videos = styled.div`
   border-radius: 10px;
   background-color: #000;
   overflow: hidden;
-  max-height: 30rem;
+  min-height: 30rem;
+  height: 100%;
 `;
 
 type VideoProps = {

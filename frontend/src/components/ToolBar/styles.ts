@@ -8,6 +8,7 @@ export const Container = styled.div`
   color: #fff;
   width: 100%;
   padding: 25px;
+  max-height: 20vh;
 `;
 
 const ButtonStyle = css`

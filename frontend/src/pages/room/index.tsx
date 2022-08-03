@@ -20,7 +20,7 @@ const Room = () => {
 
   const { connect, disconnect } = useContext(RoomContext);
 
-  const videoCard = calculateVideoCardSize(participants);
+  const videoCard = calculateVideoCardSize([]);
 
   const renderRemoteParticipants = useCallback(
     () =>

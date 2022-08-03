@@ -26,9 +26,19 @@ export const Video = styled.video`
   background-color: #000;
 `;
 
-export const VideoTurnedOff = styled.div`
+type VideoTurnedOffProps = {
+  isPrincipal?: boolean;
+};
+
+export const VideoTurnedOff = styled.div<VideoTurnedOffProps>`
   width: 90%;
   height: 100%;
+  ${({ isPrincipal }) =>
+    isPrincipal &&
+    css`
+      max-width: 20rem;
+    `}
+  aspect-ratio: 16/9;
   /* background-color: #000; */
   background-color: #e3e3e3;
   align-self: center;

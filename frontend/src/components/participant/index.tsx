@@ -11,7 +11,7 @@ import {
 } from "./styled";
 import { IProps } from "./types";
 import { useTrack } from "../../hooks/useTrack";
-import { MyVideo, VideoContainer } from "../../pages/meet/styles";
+import { MyVideo } from "../../pages/meet/styles";
 import { ParticipantsContext } from "../../contexts/Participants";
 
 const ParticipantCard = ({ participant, isLocal, width, height }: IProps) => {
@@ -24,34 +24,34 @@ const ParticipantCard = ({ participant, isLocal, width, height }: IProps) => {
 
   const { isAlone } = useContext(ParticipantsContext);
 
-  // const [
-  //   isRemoteCameraDisabledFromLocal,
-  //   setIsRemoteCameraDisabledFromLocal,
-  // ] = useState(false);
-  // const [
-  //   isRemoteMicDisabledFromLocal,
-  //   setIsRemoteMicDisabledFromLocal,
-  // ] = useState(false);
+  const [
+    isRemoteCameraDisabledFromLocal,
+    setIsRemoteCameraDisabledFromLocal,
+  ] = useState(true);
+  const [
+    isRemoteMicDisabledFromLocal,
+    setIsRemoteMicDisabledFromLocal,
+  ] = useState(true);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // const toggleLocalCamera = () => {
-  //   if (isRemoteCameraOn) {
-  //     videoTracks[0].mediaStreamTrack.enabled = isRemoteCameraDisabledFromLocal;
-  //     setIsRemoteCameraDisabledFromLocal(!isRemoteCameraDisabledFromLocal);
-  //   }
-  // };
+  const toggleLocalCamera = () => {
+    if (isRemoteCameraOn) {
+      videoTracks[0].mediaStreamTrack.enabled = isRemoteCameraDisabledFromLocal;
+      setIsRemoteCameraDisabledFromLocal(!isRemoteCameraDisabledFromLocal);
+    }
+  };
 
-  // const toggleLocalMic = () => {
-  //   if (isRemoteMicOn) {
-  //     console.log(!isMicOn());
-  //     setIsRemoteMicDisabledFromLocal(isMicOn());
-  //   }
-  // };
+  const toggleLocalMic = () => {
+    if (isRemoteMicOn) {
+      console.log(!isMicOn());
+      setIsRemoteMicDisabledFromLocal(isMicOn());
+    }
+  };
 
-  // const isMicOn = () => isRemoteMicOn && !isRemoteMicDisabledFromLocal;
-  // const isCameraOn = () => isRemoteCameraOn && !isRemoteCameraDisabledFromLocal;
+  const isMicOn = () => isRemoteMicOn && !isRemoteMicDisabledFromLocal;
+  const isCameraOn = () => isRemoteCameraOn && !isRemoteCameraDisabledFromLocal;
 
   useEffect(() => {
     const videoTrack = videoTracks[0];
@@ -75,11 +75,21 @@ const ParticipantCard = ({ participant, isLocal, width, height }: IProps) => {
   return (
     <>
       {isRemoteCameraOn ? (
-        <MyVideo ref={videoRef} autoPlay isPrincipal={isLocal && !isAlone} />
+        <MyVideo ref={videoRef} autoPlay isPrincipal={!isLocal && !isAlone} />
       ) : (
-        <VideoTurnedOff />
+        <VideoTurnedOff isPrincipal={!isLocal && !isAlone} />
       )}
-      <audio ref={audioRef} autoPlay />
+      <audio ref={audioRef} autoPlay muted={isRemoteMicDisabledFromLocal} />
+      {/* {!isLocal && (
+        <ToolBar opacity={opacity} justifyCenter>
+          <IconButton onClick={toggleLocalMic} isActive={isMicOn()}>
+            {isMicOn() ? <MdMic /> : <MdMicOff />}
+          </IconButton>
+          <IconButton onClick={toggleLocalCamera} isActive={isCameraOn()}>
+            {isCameraOn() ? <MdVideocam /> : <MdVideocamOff />}
+          </IconButton>
+        </ToolBar>
+      )} */}
     </>
   );
 };
